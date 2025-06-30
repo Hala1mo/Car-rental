@@ -1,0 +1,207 @@
+{
+ "autoname": "RB-YYYY-  ",
+ "creation": "2025-06-25 11:55:16.059505",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "booking_details",
+  "customer",
+  "status",
+  "additional_services",
+  "column_break1",
+  "vehicle",
+  "section_break2",
+  "rental_start",
+  "rate_per_day",
+  "amount",
+  "column_break0",
+  "rental_end",
+  "no_days",
+  "amended_from",
+  "section_break3",
+  "pre_break",
+  "pre_inspection_date",
+  "pre_inspecton_condition_summary",
+  "pre_inspection_fuel_level",
+  "pre_inspection_done",
+  "post_break",
+  "post_inspection_date",
+  "post_inspecton_condition_summary",
+  "post_inspection_fuel_level",
+  "post_inspection_done"
+ ],
+ "fields": [
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Customer",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "fieldname": "vehicle",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Vehicle",
+   "options": "Vehicle",
+   "reqd": 1
+  },
+  {
+   "fieldname": "rental_start",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Rental Start Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "rental_end",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Rental End Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "no_days",
+   "fieldtype": "Data",
+   "label": "Number of days",
+   "read_only": 1
+  },
+  {
+   "fieldname": "additional_services",
+   "fieldtype": "Table",
+   "label": "Additional Services",
+   "options": "Additional Services"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nConfirmed\nOut\nReturned\nCancelled",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "rate_per_day",
+   "fieldtype": "Currency",
+   "label": "Rate Per Day"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Rental Booking",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "pre_inspection_done",
+   "fieldtype": "Check",
+   "label": "Pre Inspection Done "
+  },
+  {
+   "fieldname": "pre_inspection_date",
+   "fieldtype": "Datetime",
+   "label": "Pre Inspection Date"
+  },
+  {
+   "fieldname": "pre_inspecton_condition_summary",
+   "fieldtype": "Small Text",
+   "label": "Condition Summary"
+  },
+  {
+   "fieldname": "pre_inspection_fuel_level",
+   "fieldtype": "Data",
+   "label": "Fuel Level",
+   "options": "Empty\n1/4\n1/2\n3/4\nFull"
+  },
+  {
+   "fieldname": "post_break",
+   "fieldtype": "Section Break",
+   "label": "Post-Inspection"
+  },
+  {
+   "fieldname": "post_inspection_date",
+   "fieldtype": "Datetime",
+   "label": "Post Inspection Date"
+  },
+  {
+   "fieldname": "post_inspecton_condition_summary",
+   "fieldtype": "Small Text",
+   "label": "Condition Summary"
+  },
+  {
+   "fieldname": "post_inspection_fuel_level",
+   "fieldtype": "Select",
+   "label": "Fuel Level",
+   "options": "Empty\n1/4\n1/2\n3/4\nFull"
+  },
+  {
+   "default": "0",
+   "fieldname": "post_inspection_done",
+   "fieldtype": "Check",
+   "label": "Post Inspection Done "
+  },
+  {
+   "fieldname": "pre_break",
+   "fieldtype": "Section Break",
+   "label": "Pre-Inspection"
+  },
+  {
+   "fieldname": "booking_details",
+   "fieldtype": "Section Break",
+   "label": "Booking Details"
+  },
+  {
+   "fieldname": "section_break2",
+   "fieldtype": "Section Break",
+   "label": "Rental Period & Pricing"
+  },
+  {
+   "fieldname": "section_break3",
+   "fieldtype": "Section Break",
+   "label": "Vehicle Inspection"
+  },
+  {
+   "fieldname": "column_break0",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break1",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "is_submittable": 1,
+ "modified": "2025-06-30 11:31:45.452270",
+ "modified_by": "Administrator",
+ "module": "Car Rental",
+ "name": "Rental Booking",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "filter": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

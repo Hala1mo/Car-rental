@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include car_rental *.css
+recursive-include car_rental *.csv
+recursive-include car_rental *.html
+recursive-include car_rental *.ico
+recursive-include car_rental *.js
+recursive-include car_rental *.json
+recursive-include car_rental *.md
+recursive-include car_rental *.png
+recursive-include car_rental *.py
+recursive-include car_rental *.svg
+recursive-include car_rental *.txt
+recursive-exclude car_rental *.pyc
