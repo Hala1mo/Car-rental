@@ -49,7 +49,7 @@ frappe.ui.form.on('Rental Booking', {
             frm.set_value('status', 'Draft');
         }
         setup_date_restrictions(frm);
-        // Only add buttons if document is already saved (not new)
+        check_and_submit_if_needed(frm);
         if (!frm.doc.__islocal && frm.doc.name) {
             setTimeout(() => {
                 add_action_buttons(frm);
@@ -491,4 +491,36 @@ function calculate_row_total(cdt, cdn) {
     const row = locals[cdt][cdn];
     const total = (row.rate || 0) * (row.quantity || 0);
     frappe.model.set_value(cdt, cdn, 'total', total);
+}
+
+
+function check_and_submit_if_needed(frm) {
+    // Auto-submit if status is Out but document is still draft
+    if (frm.doc.status === 'Out' && frm.doc.docstatus === 0) {
+        console.log('Auto-submitting rental booking because pre-inspection is completed');
+        
+        // Set status to Confirmed first (required for submission)
+        frm.set_value('status', 'Confirmed');
+        
+        // Save and submit
+        frm.save().then(() => {
+            frm.submit().then(() => {
+                // After submission, update status to Out
+                setTimeout(() => {
+                    frappe.call({
+                        method: 'frappe.client.set_value',
+                        args: {
+                            doctype: 'Rental Booking',
+                            name: frm.doc.name,
+                            fieldname: 'status',
+                            value: 'Out'
+                        },
+                        callback: function() {
+                            frm.reload_doc();
+                        }
+                    });
+                }, 1000);
+            });
+        });
+    }
 }

@@ -2,6 +2,37 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Vehicle Inspection', {
+
+    on_submit(frm) {
+        // After inspection is submitted, refresh the rental booking if we came from there
+        if (frm.doc.rental_booking) {
+            frappe.show_alert({
+                message: __('Inspection submitted successfully. Rental booking status updated.'),
+                indicator: 'green'
+            });
+            
+            // If we have a rental booking reference, go back to it
+            setTimeout(() => {
+                frappe.set_route('Form', 'Rental Booking', frm.doc.rental_booking);
+            }, 1500);
+        }
+    },
+
+     on_cancel(frm) {
+        // After inspection is cancelled, refresh the rental booking if we came from there
+        if (frm.doc.rental_booking) {
+            frappe.show_alert({
+                message: __('Inspection cancelled. Rental booking status updated.'),
+                indicator: 'orange'
+            });
+            
+            // If we have a rental booking reference, go back to it
+            setTimeout(() => {
+                frappe.set_route('Form', 'Rental Booking', frm.doc.rental_booking);
+            }, 1500);
+        }
+    },
+
     onload: function(frm) {
         if (frm.doc.__islocal && frappe.route_options) {
             console.log('Setting values from route options:', frappe.route_options);
@@ -74,3 +105,4 @@ function update_rental_booking_reference(frm) {
         }
     });
 }
+
