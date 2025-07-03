@@ -1,5 +1,5 @@
 {
- "autoname": "RB-YYYY-  ",
+ "autoname": "RB-.YYYY.-.####",
  "creation": "2025-06-25 11:55:16.059505",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -19,17 +19,9 @@
   "rental_end",
   "no_days",
   "amended_from",
-  "section_break3",
-  "pre_break",
-  "pre_inspection_date",
-  "pre_inspecton_condition_summary",
-  "pre_inspection_fuel_level",
-  "pre_inspection_done",
-  "post_break",
-  "post_inspection_date",
-  "post_inspecton_condition_summary",
-  "post_inspection_fuel_level",
-  "post_inspection_done"
+  "pre_inspection",
+  "post_inspection",
+  "sales_invoice"
  ],
  "fields": [
   {
@@ -64,7 +56,7 @@
   },
   {
    "fieldname": "no_days",
-   "fieldtype": "Data",
+   "fieldtype": "Int",
    "label": "Number of days",
    "read_only": 1
   },
@@ -77,8 +69,9 @@
   {
    "fieldname": "status",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Status",
-   "options": "Draft\nConfirmed\nOut\nReturned\nCancelled",
+   "options": "Draft\nConfirmed\nOut\nReturned\nCompleted",
    "read_only": 1
   },
   {
@@ -102,60 +95,6 @@
    "read_only": 1
   },
   {
-   "default": "0",
-   "fieldname": "pre_inspection_done",
-   "fieldtype": "Check",
-   "label": "Pre Inspection Done "
-  },
-  {
-   "fieldname": "pre_inspection_date",
-   "fieldtype": "Datetime",
-   "label": "Pre Inspection Date"
-  },
-  {
-   "fieldname": "pre_inspecton_condition_summary",
-   "fieldtype": "Small Text",
-   "label": "Condition Summary"
-  },
-  {
-   "fieldname": "pre_inspection_fuel_level",
-   "fieldtype": "Data",
-   "label": "Fuel Level",
-   "options": "Empty\n1/4\n1/2\n3/4\nFull"
-  },
-  {
-   "fieldname": "post_break",
-   "fieldtype": "Section Break",
-   "label": "Post-Inspection"
-  },
-  {
-   "fieldname": "post_inspection_date",
-   "fieldtype": "Datetime",
-   "label": "Post Inspection Date"
-  },
-  {
-   "fieldname": "post_inspecton_condition_summary",
-   "fieldtype": "Small Text",
-   "label": "Condition Summary"
-  },
-  {
-   "fieldname": "post_inspection_fuel_level",
-   "fieldtype": "Select",
-   "label": "Fuel Level",
-   "options": "Empty\n1/4\n1/2\n3/4\nFull"
-  },
-  {
-   "default": "0",
-   "fieldname": "post_inspection_done",
-   "fieldtype": "Check",
-   "label": "Post Inspection Done "
-  },
-  {
-   "fieldname": "pre_break",
-   "fieldtype": "Section Break",
-   "label": "Pre-Inspection"
-  },
-  {
    "fieldname": "booking_details",
    "fieldtype": "Section Break",
    "label": "Booking Details"
@@ -166,21 +105,34 @@
    "label": "Rental Period & Pricing"
   },
   {
-   "fieldname": "section_break3",
-   "fieldtype": "Section Break",
-   "label": "Vehicle Inspection"
-  },
-  {
    "fieldname": "column_break0",
    "fieldtype": "Column Break"
   },
   {
    "fieldname": "column_break1",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "pre_inspection",
+   "fieldtype": "Link",
+   "label": "Pre Inspection",
+   "options": "Vehicle Inspection"
+  },
+  {
+   "fieldname": "post_inspection",
+   "fieldtype": "Link",
+   "label": "Post Inspection",
+   "options": "Vehicle Inspection"
+  },
+  {
+   "fieldname": "sales_invoice",
+   "fieldtype": "Link",
+   "label": "Sales Invoice",
+   "options": "Sales Invoice"
   }
  ],
  "is_submittable": 1,
- "modified": "2025-06-30 11:31:45.452270",
+ "modified": "2025-07-03 09:51:35.890245",
  "modified_by": "Administrator",
  "module": "Car Rental",
  "name": "Rental Booking",
@@ -196,6 +148,19 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "filter": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
    "share": 1,
    "write": 1
   }

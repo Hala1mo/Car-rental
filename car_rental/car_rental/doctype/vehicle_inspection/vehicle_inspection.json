@@ -1,0 +1,96 @@
+{
+ "autoname": "VI-.YYYY.-.MM.-.####",
+ "creation": "2025-07-01 16:08:45.797463",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "inspection_type",
+  "rental_booking",
+  "inspection_date",
+  "condition_summary",
+  "amended_from",
+  "vehicle",
+  "status",
+  "fuel_level"
+ ],
+ "fields": [
+  {
+   "fieldname": "condition_summary",
+   "fieldtype": "Small Text",
+   "label": "Condition Summary"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Vehicle Inspection",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "rental_booking",
+   "fieldtype": "Link",
+   "label": "Rental Booking",
+   "options": "Rental Booking",
+   "read_only": 1
+  },
+  {
+   "fieldname": "vehicle",
+   "fieldtype": "Link",
+   "label": "Vehicle",
+   "options": "Vehicle",
+   "read_only": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nCompleted",
+   "read_only": 1
+  },
+  {
+   "fieldname": "fuel_level",
+   "fieldtype": "Select",
+   "label": "Fuel level",
+   "options": "Empty\n1/2\n3/4\nFull"
+  },
+  {
+   "fieldname": "inspection_type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "Pre-Inspection\nPost-Inspection"
+  },
+  {
+   "fieldname": "inspection_date",
+   "fieldtype": "Datetime",
+   "label": "Date"
+  }
+ ],
+ "is_submittable": 1,
+ "modified": "2025-07-03 11:42:51.109454",
+ "modified_by": "Administrator",
+ "module": "Car Rental",
+ "name": "Vehicle Inspection",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "filter": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

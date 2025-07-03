@@ -5,10 +5,12 @@ from frappe import _
 def get_data():
 	return [
 		{
-			"module_name": "Car Rental",
-			"color": "grey",
+			"module_name": "car_rental",
+            "category": "Modules",
+   	        "color": "#f7d5bd",
 			"icon": "fa fa-car",
 			"type": "module",
-			"label": _("Car Rental")
+			"label": _("Car Rental"),
+            "description": "Halooossss",
 		}
 	]

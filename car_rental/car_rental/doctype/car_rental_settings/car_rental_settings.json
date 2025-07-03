@@ -1,0 +1,58 @@
+{
+ "creation": "2025-07-02 14:34:51.689687",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "rental_service",
+  "automatic_sales_invoice"
+ ],
+ "fields": [
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "rental_service",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Rental Service",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "automatic_sales_invoice",
+   "fieldtype": "Check",
+   "label": "Automatic Sales Invoice"
+  }
+ ],
+ "issingle": 1,
+ "modified": "2025-07-02 14:34:51.689687",
+ "modified_by": "Administrator",
+ "module": "Car Rental",
+ "name": "Car Rental Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "filter": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

@@ -44,7 +44,20 @@ def get_data():
                     "description": _("Customer database")
                 }
             ]
-        }
+        },
+         {
+            "label": _("Settings"),
+            "icon": "fa fa-car",
+            "items": [
+                {
+                    "type": "doctype",
+                    "name": "Car Rental Settings",
+                    "doctype": "Car Rental Settings",
+                    "description": _("Manage your vehicle fleet")
+                }
+            
+            ]
+        },
         # {
         #     "label": _("Reports & Analytics"),
         #     "icon": "fa fa-bar-chart",
