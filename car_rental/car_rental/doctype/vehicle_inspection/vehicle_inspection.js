@@ -4,7 +4,6 @@
 frappe.ui.form.on('Vehicle Inspection', {
 
     on_submit(frm) {
-        // After inspection is submitted, refresh the rental booking if we came from there
         if (frm.doc.rental_booking) {
             frappe.show_alert({
                 message: __('Inspection submitted successfully. Rental booking status updated.'),

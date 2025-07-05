@@ -1,14 +1,39 @@
 {
- "autoname": "RC-YYYY-MM-.###",
+ "autoname": "RC-.YYYY.-.MM.-.####",
  "creation": "2025-06-29 12:37:37.733182",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "contract_details_section",
+  "contract_number",
   "rental_booking",
+  "customer",
+  "column_break5",
   "contract_date",
-  "lega_and_terms",
   "contract_status",
+  "vehicle",
+  "customer_information_section",
+  "customer_id_number",
+  "customer_name",
+  "column_break_11",
+  "customer_phone",
+  "customer_email",
+  "vehicle_information_section",
+  "license_plate",
+  "vehicle_make",
+  "column_break_1",
+  "vehicle_model",
+  "rental_details_section",
+  "rental_start_date",
+  "rental_end_date",
+  "rental_days",
+  "column_break_25",
+  "rate_per_day",
+  "total_amount",
+  "additional_services_section",
+  "additional_services",
+  "lega_and_terms",
   "amended_from"
  ],
  "fields": [
@@ -31,8 +56,136 @@
   {
    "fieldname": "contract_status",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Status",
-   "options": "Draft\nActive\nCompleted\nTerminated"
+   "options": "Draft\nActive\nCompleted\nTerminated",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "Customer Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "vehicle",
+   "fieldtype": "Link",
+   "label": "Vehicle",
+   "options": "Vehicle"
+  },
+  {
+   "fieldname": "customer_information_section",
+   "fieldtype": "Section Break",
+   "label": "Customer Information"
+  },
+  {
+   "fieldname": "customer_email",
+   "fieldtype": "Data",
+   "label": "Customer Email"
+  },
+  {
+   "fieldname": "customer_phone",
+   "fieldtype": "Data",
+   "label": "Customer Phone"
+  },
+  {
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer_id_number",
+   "fieldtype": "Data",
+   "label": "Customer Id "
+  },
+  {
+   "fieldname": "contract_details_section",
+   "fieldtype": "Section Break",
+   "label": "Contract Details"
+  },
+  {
+   "fieldname": "contract_number",
+   "fieldtype": "Data",
+   "label": "Contract Number",
+   "read_only": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "vehicle_information_section",
+   "fieldtype": "Section Break",
+   "label": "Vehicle Information"
+  },
+  {
+   "fieldname": "license_plate",
+   "fieldtype": "Data",
+   "label": "license Plate"
+  },
+  {
+   "fieldname": "vehicle_make",
+   "fieldtype": "Data",
+   "label": "Vehicle Make",
+   "read_only": 1
+  },
+  {
+   "fieldname": "vehicle_model",
+   "fieldtype": "Data",
+   "label": "Vehicle Model",
+   "read_only": 1
+  },
+  {
+   "fieldname": "rental_details_section",
+   "fieldtype": "Section Break",
+   "label": "Rental Details"
+  },
+  {
+   "fieldname": "rental_start_date",
+   "fieldtype": "Data",
+   "label": "Rental Start Date"
+  },
+  {
+   "fieldname": "rental_end_date",
+   "fieldtype": "Data",
+   "label": "Rental End Date"
+  },
+  {
+   "fieldname": "rental_days",
+   "fieldtype": "Data",
+   "label": "Rental Days"
+  },
+  {
+   "fieldname": "column_break_25",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rate_per_day",
+   "fieldtype": "Data",
+   "label": "Rate Per Day"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Data",
+   "label": "Total",
+   "read_only": 1
+  },
+  {
+   "fieldname": "additional_services_section",
+   "fieldtype": "Section Break",
+   "label": "Additional Services"
+  },
+  {
+   "fieldname": "additional_services",
+   "fieldtype": "Table",
+   "label": "Additional Services",
+   "options": "Additional Services"
   },
   {
    "fieldname": "amended_from",
@@ -42,10 +195,14 @@
    "options": "Rental Contract",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
   }
  ],
  "is_submittable": 1,
- "modified": "2025-07-01 14:01:09.436007",
+ "modified": "2025-07-03 15:50:02.745772",
  "modified_by": "Administrator",
  "module": "Car Rental",
  "name": "Rental Contract",

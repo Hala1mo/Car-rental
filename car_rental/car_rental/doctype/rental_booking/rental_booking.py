@@ -26,6 +26,9 @@ class RentalBooking(Document):
         """Handle status changes after document is submitted"""
         if self.vehicle and not self.flags.ignore_vehicle_update:
             self.update_vehicle_status()
+            
+        if self.rental_contract:
+          self.update_contract_status()
     
     def update_vehicle_status(self):
         """Update vehicle status based on rental booking status"""
@@ -70,12 +73,28 @@ class RentalBooking(Document):
 
     def on_cancel(self):
         """Actions when document is cancelled"""
-        self.status = 'Cancelled'
-        
+       
+        if self.rental_contract:
+            try:
+                 frappe.db.set_value('Rental Contract', self.rental_contract, {
+                'rental_booking': None,
+                'contract_status': 'Terminated'
+            })
+                 frappe.db.commit()
+            
+                 frappe.msgprint(
+                f"Rental Contract {self.rental_contract} link removed and status updated to Terminated",
+                alert=True,
+                indicator='orange'
+            )
+            except Exception as e:
+                 frappe.log_error(f"Error handling contract on cancel: {str(e)}")
+          
         # Cancel related vehicle inspections
         self.cancel_related_inspections()
         
         # Update vehicle status to Available
+        
         if self.vehicle:
             try:
                 vehicle_doc = frappe.get_doc('Vehicle', self.vehicle)
@@ -89,6 +108,9 @@ class RentalBooking(Document):
                 )
             except Exception as e:
                 frappe.log_error(f"Error updating vehicle status on cancel: {str(e)}")
+        
+        self.status = 'Cancelled'        
+     
 
     def cancel_related_inspections(self):
         """Cancel related vehicle inspections when rental booking is cancelled"""
@@ -115,7 +137,45 @@ class RentalBooking(Document):
         except Exception as e:
             frappe.log_error(f"Error cancelling related inspections: {str(e)}")
 
-
+        
+    def update_contract_status(self):
+       """Update contract status based on rental booking status"""
+       if self.rental_contract:
+        try:
+            contract_doc = frappe.get_doc('Rental Contract', self.rental_contract)
+            
+            # Update contract status based on rental booking status
+            if self.status == 'Completed':
+                if contract_doc.contract_status != 'Completed':
+                    contract_doc.contract_status = 'Completed'
+                    contract_doc.flags.ignore_permissions = True
+                    contract_doc.flags.ignore_validate_update_after_submit = True
+                    contract_doc.save()
+                    
+                    frappe.msgprint(
+                        f"Contract {self.rental_contract} marked as completed",
+                        alert=True,
+                        indicator='green'
+                    )
+            
+            elif self.status == 'Cancelled':
+                if contract_doc.contract_status != 'Terminated':
+                    contract_doc.contract_status = 'Terminated'
+                    contract_doc.flags.ignore_permissions = True
+                    contract_doc.flags.ignore_validate_update_after_submit = True
+                    contract_doc.save()
+                    
+                    frappe.msgprint(
+                        f"Contract {self.rental_contract} marked as terminated",
+                        alert=True,
+                        indicator='orange'
+                    )
+                    
+        except Exception as e:
+            frappe.log_error(f"Error updating contract status: {str(e)}")
+            
+            
+        
 
 @frappe.whitelist()
 def get_vehicle_availability(vehicle, start_date, end_date, exclude_booking=None):
@@ -158,83 +218,6 @@ def get_vehicle_availability(vehicle, start_date, end_date, exclude_booking=None
         }
         
         
-# @frappe.whitelist()
-# def create_sales_invoice_from_booking(rental_booking_name):
-#     """Create Sales Invoice from Rental Booking after post-inspection"""
-#     try:
-#         rental_doc = frappe.get_doc('Rental Booking', rental_booking_name)
-        
-#         # Get settings safely
-#         try:
-#             settings = frappe.get_single('Car Rental Settings')
-#         except:
-#             settings = None
-    
-#         # Validate conditions
-#         if rental_doc.status != 'Returned':
-#             frappe.throw("Sales Invoice can only be created when rental status is 'Returned'")
-            
-#         if not rental_doc.post_inspection:
-#             frappe.throw("Post-inspection must be completed before creating invoice")
- 
-#         post_inspection = frappe.get_doc('Vehicle Inspection', rental_doc.post_inspection)
-#         if post_inspection.docstatus != 1:
-#             frappe.throw("Post-inspection must be submitted before creating invoice")
-            
-#         if rental_doc.sales_invoice:
-#             frappe.throw("Sales Invoice already exists for this rental booking")
-        
-#         # Create invoice
-#         invoice = frappe.new_doc('Sales Invoice')
-#         invoice.customer = rental_doc.customer
-#         invoice.posting_date = frappe.utils.today()
-#         invoice.due_date = frappe.utils.add_days(frappe.utils.today(), 30)
-#         invoice.set_posting_time = 1
-#         invoice.remarks = f"Sales Invoice for Rental Booking: {rental_doc.name}"
-        
-#         # Add rental service item
-#         rental_item = invoice.append('items', {})
-        
-#         # Use a safe item code
-#         if settings and hasattr(settings, 'rental_service') and settings.rental_service:
-#             rental_item.item_code = settings.rental_service
-#         else:
-#             rental_item.item_code = 'VEHICLE-RENTAL-SERVICE'
-            
-#         rental_item.item_name = f"Vehicle Rental - {rental_doc.vehicle}"
-#         rental_item.description = f"Rental of {rental_doc.vehicle} from {rental_doc.rental_start} to {rental_doc.rental_end}"
-#         rental_item.qty = rental_doc.no_days or 1
-#         rental_item.rate = rental_doc.rate_per_day or 0
-#         rental_item.amount = (rental_doc.no_days or 1) * (rental_doc.rate_per_day or 0)
-        
-#         # Set rental booking reference if field exists
-#         try:
-#             if hasattr(invoice, 'rental_booking_reference'):
-#                 invoice.rental_booking_reference = rental_doc.name
-#         except:
-#             pass
-        
-#         # Insert invoice
-#         invoice.insert()
-        
-#         # Update rental booking with invoice reference
-#         rental_doc.sales_invoice = invoice.name
-#         rental_doc.flags.ignore_permissions = True
-#         rental_doc.flags.ignore_validate_update_after_submit = True
-#         rental_doc.save()
-        
-#         return {
-#             'status': 'success',
-#             'invoice_name': invoice.name,
-#             'message': f'Sales Invoice {invoice.name} created successfully'
-#         }
-        
-#     except Exception as e:
-#         frappe.log_error(f"Error creating sales invoice: {str(e)}")
-#         return {
-#             'status': 'error',
-#             'message': str(e)
-#         }     
 
 @frappe.whitelist()
 def create_sales_invoice_from_booking(rental_booking_name):
@@ -378,8 +361,7 @@ def check_and_complete_if_paid(rental_booking_name):
             
         if rental_doc.status != 'Returned':
             return {'status': 'error', 'message': 'Rental must be in Returned status'}
-            
-        # Check if invoice is submitted and paid
+      
         invoice = frappe.get_doc('Sales Invoice', rental_doc.sales_invoice)
         
         if invoice.docstatus != 1:
@@ -388,7 +370,7 @@ def check_and_complete_if_paid(rental_booking_name):
         if invoice.outstanding_amount > 0:
             return {'status': 'pending_payment', 'message': f'Invoice has outstanding amount of {invoice.outstanding_amount}'}
             
-        # Invoice is paid, complete the rental
+        # Update rental booking status to Completed
         rental_doc.status = 'Completed'
         rental_doc.flags.ignore_permissions = True
         rental_doc.flags.ignore_validate_update_after_submit = True
@@ -405,6 +387,14 @@ def check_and_complete_if_paid(rental_booking_name):
                 f"Rental {rental_booking_name} completed automatically after payment confirmation. Vehicle {rental_doc.vehicle} is now available.",
                 alert=True
             )
+            
+        # Update contract status to Completed
+        if rental_doc.rental_contract:
+            contract_doc = frappe.get_doc('Rental Contract', rental_doc.rental_contract)
+            contract_doc.contract_status = 'Completed'
+            contract_doc.flags.ignore_permissions = True
+            contract_doc.flags.ignore_validate_update_after_submit = True
+            contract_doc.save()
         
         return {
             'status': 'success',
@@ -414,10 +404,6 @@ def check_and_complete_if_paid(rental_booking_name):
     except Exception as e:
         frappe.log_error(f"Error completing rental after payment: {str(e)}")
         return {'status': 'error', 'message': str(e)}
-
-
-# PAYMENT HOOKS - These handle automatic completion after payment
-
 def on_payment_entry_submit(doc, method):
     """Hook called when a Payment Entry is submitted"""
     try:
