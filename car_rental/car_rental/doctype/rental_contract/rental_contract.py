@@ -27,7 +27,7 @@ class RentalContract(Document):
             self.populate_from_rental_booking()
         
         
-        if self.docstatus == 1 and not self.lega_and_terms:
+        if self.docstatus == 1 and not self.legal_and_terms:
             frappe.throw("Terms and conditions are required before submitting the contract")
     
     def validate_rental_booking(self):
@@ -97,7 +97,7 @@ class RentalContract(Document):
     def on_submit(self):
         """Actions when contract is submitted"""
         # Validate terms and conditions are provided
-        if not self.lega_and_terms:
+        if not self.legal_and_terms:
             frappe.throw("Terms and conditions must be provided before submitting the contract")
         
         # Set status to Active
@@ -180,3 +180,6 @@ def create_contract_from_booking(rental_booking_name):
             'status': 'error',
             'message': str(e)
         }
+    
+
+  

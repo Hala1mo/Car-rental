@@ -19,8 +19,8 @@ frappe.ui.form.on('Rental Contract', {
             frm.set_value('contract_status', 'Draft');
             
             // Add helpful placeholder for terms and conditions
-            if (!frm.doc.lega_and_terms) {
-                frm.fields_dict.lega_and_terms.$wrapper.find('textarea').attr('placeholder', 
+            if (!frm.doc.legal_and_terms) {
+                frm.fields_dict.legal_and_terms.$wrapper.find('textarea').attr('placeholder', 
                     'Please enter the terms and conditions for this rental contract...\n\n' +
                     'You may include:\n' +
                     '• Vehicle condition requirements\n' +
@@ -47,7 +47,7 @@ frappe.ui.form.on('Rental Contract', {
     
     before_submit(frm) {
         // Validate terms and conditions are provided
-        if (!frm.doc.lega_and_terms || frm.doc.lega_and_terms.trim() === '') {
+        if (!frm.doc.legal_and_terms || frm.doc.legal_and_terms.trim() === '') {
             frappe.msgprint({
                 title: __('Missing Terms and Conditions'),
                 message: __('Please provide the terms and conditions before submitting the contract'),
@@ -100,7 +100,7 @@ function add_contract_buttons(frm) {
     }
     
     // Add Template Terms button if terms are empty (for both new and existing drafts)
-    if (frm.doc.docstatus === 0 && (!frm.doc.lega_and_terms || frm.doc.lega_and_terms.trim() === '')) {
+    if (frm.doc.docstatus === 0 && (!frm.doc.legal_and_terms || frm.doc.legal_and_terms.trim() === '')) {
         frm.add_custom_button(__('Add Template Terms'), () => {
             add_template_terms(frm);
         }).addClass('btn-secondary');
@@ -306,7 +306,7 @@ Customer Signature: _____________________ Date: ___________
 
 Company Representative: _________________ Date: ___________`;
 
-            frm.set_value('lega_and_terms', template_terms);
+            frm.set_value('legal_and_terms', template_terms);
             
             frappe.show_alert({
                 message: __('Template terms added. Please review and modify as needed.'),

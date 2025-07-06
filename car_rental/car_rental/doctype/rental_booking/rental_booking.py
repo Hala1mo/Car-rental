@@ -32,34 +32,7 @@ class RentalBooking(Document):
     
     def update_vehicle_status(self):
         """Update vehicle status based on rental booking status"""
-        if not self.vehicle:
-            return
-            
-        try:
-            vehicle_doc = frappe.get_doc('Vehicle', self.vehicle)
-            current_vehicle_status = vehicle_doc.status
-            new_vehicle_status = None
-            
-            # Determine new vehicle status based on rental booking status
-            if self.status == 'Confirmed':
-                new_vehicle_status = 'Booked'
-            elif self.status == 'Out':
-                new_vehicle_status = 'Rented'
-            elif self.status in ['Completed', 'Cancelled', 'Returned']:
-                new_vehicle_status = 'Available'
-            
-            # Update vehicle status if it needs to change
-            if new_vehicle_status and current_vehicle_status != new_vehicle_status:
-                vehicle_doc.status = new_vehicle_status
-                vehicle_doc.flags.ignore_permissions = True
-                vehicle_doc.save()
-                
-                frappe.msgprint(
-                    f"Vehicle {self.vehicle} status updated from {current_vehicle_status} to {new_vehicle_status}",
-                    alert=True
-                )
-        except Exception as e:
-            frappe.log_error(f"Error updating vehicle status: {str(e)}")
+        self.update_vehicle_status_smart()
 
     def on_submit(self):
         """Actions when document is submitted"""
@@ -95,25 +68,22 @@ class RentalBooking(Document):
         
         # Update vehicle status to Available
         
-        if self.vehicle:
-            try:
-                vehicle_doc = frappe.get_doc('Vehicle', self.vehicle)
-                vehicle_doc.status = 'Available'
-                vehicle_doc.flags.ignore_permissions = True
-                vehicle_doc.save()
-                
-                frappe.msgprint(
-                    f"Vehicle {self.vehicle} status updated to Available",
-                    alert=True
-                )
-            except Exception as e:
-                frappe.log_error(f"Error updating vehicle status on cancel: {str(e)}")
-        
         self.status = "Cancelled"
         frappe.db.set_value('Rental Booking', self.name, 'status', 'Cancelled')
         frappe.db.commit()      
      
-
+        if self.vehicle:
+            try:
+              self.update_vehicle_status_smart()
+            
+              frappe.msgprint(
+                f"Vehicle {self.vehicle} status updated based on remaining active bookings",
+                alert=True
+               )
+            except Exception as e:
+              frappe.log_error(f"Error updating vehicle status on cancel: {str(e)}")
+        
+        
     def cancel_related_inspections(self):
         """Cancel related vehicle inspections when rental booking is cancelled"""
         try:
@@ -139,7 +109,6 @@ class RentalBooking(Document):
         except Exception as e:
             frappe.log_error(f"Error cancelling related inspections: {str(e)}")
 
-        
     def update_contract_status(self):
        """Update contract status based on rental booking status"""
        if self.rental_contract:
@@ -175,9 +144,120 @@ class RentalBooking(Document):
                     
         except Exception as e:
             frappe.log_error(f"Error updating contract status: {str(e)}")
-            
-            
+     
+     
+    def update_vehicle_status_smart(self):
+      """Smart vehicle status update based on current date and all active bookings"""
+      if not self.vehicle:
+        return
         
+      try:
+        from frappe.utils import today, getdate
+        current_date = getdate(today())
+        
+        # Get all active bookings for this vehicle (not cancelled/completed)
+        active_bookings = frappe.get_all(
+            'Rental Booking',
+            filters={
+                'vehicle': self.vehicle,
+                'docstatus': 1,  # Only submitted bookings
+                'status': ['not in', ['Cancelled', 'Completed']]
+            },
+            fields=['name', 'rental_start', 'rental_end', 'status'],
+            order_by='rental_start'
+        )
+        
+        vehicle_doc = frappe.get_doc('Vehicle', self.vehicle)
+        current_vehicle_status = vehicle_doc.status
+        new_vehicle_status = 'Available'  # Default
+        
+        # Check what status the vehicle should have based on current date
+        for booking in active_bookings:
+            booking_start = getdate(booking.rental_start)
+            booking_end = getdate(booking.rental_end)
+            
+            if booking_start <= current_date <= booking_end:
+                # Vehicle is currently rented
+                if booking.status == 'Out':
+                    new_vehicle_status = 'Rented'
+                    break
+                elif booking.status == 'Confirmed':
+                    new_vehicle_status = 'Booked'
+                    break
+            elif booking_start > current_date:
+                # Future booking exists
+                if new_vehicle_status == 'Available':  # Only if not already rented/booked
+                    new_vehicle_status = 'Booked'
+        
+        # Update vehicle status if it needs to change
+        if current_vehicle_status != new_vehicle_status:
+            vehicle_doc.status = new_vehicle_status
+            vehicle_doc.flags.ignore_permissions = True
+            vehicle_doc.save()
+            
+            frappe.msgprint(
+                f"Vehicle {self.vehicle} status updated to {new_vehicle_status}",
+                alert=True
+            )
+            
+      except Exception as e:
+        frappe.log_error(f"Error in smart vehicle status update: {str(e)}")       
+        
+               
+            
+@frappe.whitelist()
+def update_all_vehicle_statuses():
+    """Update all vehicle statuses based on current bookings - can be run as scheduled job"""
+    try:
+        from frappe.utils import today, getdate
+        current_date = getdate(today())
+        
+        # Get all vehicles
+        vehicles = frappe.get_all('Vehicle', fields=['name', 'status'])
+        
+        for vehicle in vehicles:
+            # Get all active bookings for this vehicle
+            active_bookings = frappe.get_all(
+                'Rental Booking',
+                filters={
+                    'vehicle': vehicle.name,
+                    'docstatus': 1,
+                    'status': ['not in', ['Cancelled', 'Completed']]
+                },
+                fields=['name', 'rental_start', 'rental_end', 'status'],
+                order_by='rental_start'
+            )
+            
+            new_status = 'Available'  # Default
+            
+            # Check current status based on today's date
+            for booking in active_bookings:
+                booking_start = getdate(booking.rental_start)
+                booking_end = getdate(booking.rental_end)
+                
+                if booking_start <= current_date <= booking_end:
+                    # Currently in use
+                    if booking.status == 'Out':
+                        new_status = 'Rented'
+                        break
+                    elif booking.status == 'Confirmed':
+                        new_status = 'Booked'
+                        break
+                elif booking_start > current_date:
+                    # Future booking
+                    if new_status == 'Available':
+                        new_status = 'Booked'
+            
+            # Update if status changed
+            if vehicle.status != new_status:
+                frappe.db.set_value('Vehicle', vehicle.name, 'status', new_status)
+                
+        frappe.db.commit()
+        return f"Updated vehicle statuses based on current date: {current_date}"
+        
+    except Exception as e:
+        frappe.log_error(f"Error updating all vehicle statuses: {str(e)}")
+        return f"Error: {str(e)}"        
 
 @frappe.whitelist()
 def get_vehicle_availability(vehicle, start_date, end_date, exclude_booking=None):
@@ -468,7 +548,4 @@ def on_sales_invoice_update(doc, method):
                         
     except Exception as e:
         frappe.log_error(f"Error in sales invoice update hook: {str(e)}")   
-        
-        
-        
         

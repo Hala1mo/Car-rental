@@ -33,7 +33,7 @@
   "total_amount",
   "additional_services_section",
   "additional_services",
-  "lega_and_terms",
+  "legal_and_terms",
   "amended_from"
  ],
  "fields": [
@@ -47,11 +47,6 @@
    "fieldname": "contract_date",
    "fieldtype": "Datetime",
    "label": "Contract Date "
-  },
-  {
-   "fieldname": "lega_and_terms",
-   "fieldtype": "Long Text",
-   "label": "Legal and terms"
   },
   {
    "fieldname": "contract_status",
@@ -199,10 +194,15 @@
   {
    "fieldname": "column_break_1",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "legal_and_terms",
+   "fieldtype": "Long Text",
+   "label": "Legal and terms"
   }
  ],
  "is_submittable": 1,
- "modified": "2025-07-03 15:50:02.745772",
+ "modified": "2025-07-06 13:33:51.169250",
  "modified_by": "Administrator",
  "module": "Car Rental",
  "name": "Rental Contract",

@@ -22,6 +22,8 @@ class VehicleInspection(Document):
 
     def on_submit(self):
       self.status = 'Submitted'
+      frappe.db.set_value('Vehicle Inspection', self.name, 'status', 'Submitted')
+      frappe.db.commit()  
       if not self.rental_booking or not self.inspection_type:
         return
 
@@ -50,6 +52,7 @@ class VehicleInspection(Document):
             rental_doc.flags.ignore_permissions = True
             rental_doc.flags.ignore_validate_update_after_submit = True
             rental_doc.save()
+            rental_doc.update_vehicle_status_smart()
 
         frappe.msgprint(
             f"Rental booking {self.rental_booking} status updated to: {rental_doc.status}",
