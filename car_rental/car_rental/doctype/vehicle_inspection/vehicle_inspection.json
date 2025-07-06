@@ -46,8 +46,9 @@
   {
    "fieldname": "status",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Status",
-   "options": "Draft\nCompleted",
+   "options": "Draft\nSubmitted",
    "read_only": 1
   },
   {
@@ -69,7 +70,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2025-07-03 11:42:51.109454",
+ "modified": "2025-07-06 11:05:32.931662",
  "modified_by": "Administrator",
  "module": "Car Rental",
  "name": "Vehicle Inspection",

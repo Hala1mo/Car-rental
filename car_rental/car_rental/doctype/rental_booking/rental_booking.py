@@ -109,7 +109,9 @@ class RentalBooking(Document):
             except Exception as e:
                 frappe.log_error(f"Error updating vehicle status on cancel: {str(e)}")
         
-        self.status = 'Cancelled'        
+        self.status = "Cancelled"
+        frappe.db.set_value('Rental Booking', self.name, 'status', 'Cancelled')
+        frappe.db.commit()      
      
 
     def cancel_related_inspections(self):
@@ -179,12 +181,17 @@ class RentalBooking(Document):
 
 @frappe.whitelist()
 def get_vehicle_availability(vehicle, start_date, end_date, exclude_booking=None):
-    """Check vehicle availability for given dates"""
+    """Enhanced vehicle availability checker with detailed status"""
     try:
+        from frappe.utils import getdate
+        
+        start_date = getdate(start_date)
+        end_date = getdate(end_date)
+        
         filters = {
             'vehicle': vehicle,
-            'status': ['not in', ['Cancelled', 'Completed', 'Draft']],
-            'docstatus': ['!=', 2]  # Not cancelled
+            'docstatus': 1,  # Only submitted bookings
+            'status': ['not in', ['Cancelled', 'Completed']]
         }
         
         if exclude_booking:
@@ -196,22 +203,34 @@ def get_vehicle_availability(vehicle, start_date, end_date, exclude_booking=None
             fields=['name', 'rental_start', 'rental_end', 'status', 'customer']
         )
         
-        # Check for date conflicts
         conflicts = []
         for booking in conflicting_bookings:
-            booking_start = booking.rental_start
-            booking_end = booking.rental_end
+            booking_start = getdate(booking.rental_start)
+            booking_end = getdate(booking.rental_end)
             
-            # Check if dates overlap
-            if (start_date <= booking_end and end_date >= booking_start):
-                conflicts.append(booking)
+            # Check for overlap
+            if start_date <= booking_end and end_date >= booking_start:
+                conflicts.append({
+                    'booking_name': booking.name,
+                    'start_date': booking.rental_start,
+                    'end_date': booking.rental_end,
+                    'status': booking.status,
+                    'customer': booking.customer,
+                    'overlap_type': 'full' if booking_start <= start_date and booking_end >= end_date else 'partial'
+                })
         
         return {
             'available': len(conflicts) == 0,
-            'conflicts': conflicts
+            'conflicts': conflicts,
+            'vehicle': vehicle,
+            'requested_period': {
+                'start': start_date,
+                'end': end_date
+            }
         }
+        
     except Exception as e:
-        frappe.log_error(f"Error checking vehicle availability: {str(e)}")
+        frappe.log_error(f"Error checking enhanced vehicle availability: {str(e)}")
         return {
             'available': False,
             'error': str(e)
