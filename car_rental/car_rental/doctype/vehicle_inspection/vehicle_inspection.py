@@ -49,6 +49,7 @@ class VehicleInspection(Document):
             rental_doc.flags.ignore_permissions = True
             rental_doc.flags.ignore_validate_update_after_submit = True
             rental_doc.save()
+            rental_doc.update_vehicle_status_smart()
             rental_doc.reload()
             if rental_doc.status == 'Out' and rental_doc.pre_inspection == self.name:
                     frappe.msgprint(f"Rental booking {self.rental_booking} status updated to 'Out'", alert=True, indicator='green')
