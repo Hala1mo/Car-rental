@@ -107,23 +107,6 @@ This system manages the complete car rental business process with automated work
 8. ✅ Rental Automatically Completed
 ```
 
-## 🔌 Key API Methods
-
-### 📝 Rental Booking APIs
-```python
-@frappe.whitelist()
-def create_sales_invoice_from_booking(rental_booking_name)
-def check_and_complete_if_paid(rental_booking_name)
-def get_vehicle_availability(vehicle, start_date, end_date)
-def update_all_vehicle_statuses()
-```
-
-### 📄 Contract APIs
-```python
-@frappe.whitelist()
-def create_contract_from_booking(rental_booking_name)
-```
-
 ## 🧠 Smart Vehicle Status Management
 
 The system uses an intelligent algorithm that considers:
