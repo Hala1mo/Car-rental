@@ -29,16 +29,6 @@ doc_events = {
 }
 
 
-scheduler_events = {
-    "daily": [
-        "car_rental.car_rental.doctype.rental_booking.rental_booking.update_all_vehicle_statuses"
-    ],
-    "hourly": [
-        "car_rental.car_rental.doctype.rental_booking.rental_booking.update_all_vehicle_statuses"
-    ]
-}
-
-
 # include js, css files in header of web template
 # web_include_css = "/assets/car_rental/css/car_rental.css"
 # web_include_js = "/assets/car_rental/js/car_rental.js"
