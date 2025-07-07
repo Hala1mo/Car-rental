@@ -2,23 +2,19 @@
 
 frappe.ui.form.on('Rental Contract', {
     refresh(frm) {
-        // Add custom buttons
+     
         add_contract_buttons(frm);
         
-        // Set queries
         setup_queries(frm);
-        
-        // Update contract status display
+  
         update_status_display(frm);
     },
     
     onload(frm) {
-        // Set default values for new contracts
         if (frm.doc.__islocal) {
             frm.set_value('contract_date', frappe.datetime.now_datetime());
             frm.set_value('contract_status', 'Draft');
-            
-            // Add helpful placeholder for terms and conditions
+        
             if (!frm.doc.legal_and_terms) {
                 frm.fields_dict.legal_and_terms.$wrapper.find('textarea').attr('placeholder', 
                     'Please enter the terms and conditions for this rental contract...\n\n' +
@@ -36,17 +32,17 @@ frappe.ui.form.on('Rental Contract', {
     },
     
     rental_booking(frm) {
-        // Auto-populate fields when rental booking is selected
+    
         if (frm.doc.rental_booking) {
             populate_from_rental_booking(frm);
         } else {
-            // Clear fields if rental booking is removed
+            
             clear_rental_fields(frm);
         }
     },
     
     before_submit(frm) {
-        // Validate terms and conditions are provided
+   
         if (!frm.doc.legal_and_terms || frm.doc.legal_and_terms.trim() === '') {
             frappe.msgprint({
                 title: __('Missing Terms and Conditions'),
@@ -56,8 +52,6 @@ frappe.ui.form.on('Rental Contract', {
             frappe.validated = false;
             return;
         }
-        
-        // Set status to Active when submitted
         frm.set_value('contract_status', 'Active');
     },
     
@@ -66,15 +60,12 @@ frappe.ui.form.on('Rental Contract', {
             message: __('Rental contract submitted successfully'),
             indicator: 'green'
         });
-        
-        // Refresh to show updated status
         setTimeout(() => {
             frm.reload_doc();
         }, 1000);
     },
     
     on_cancel(frm) {
-        // Update status to Terminated
         frm.set_value('contract_status', 'Terminated');
         
         frappe.show_alert({
@@ -86,12 +77,10 @@ frappe.ui.form.on('Rental Contract', {
 
 function add_contract_buttons(frm) {
     if (!frm.doc.__islocal) {
-        // Add Print Contract button
         frm.add_custom_button(__('Print Contract'), () => {
             print_contract(frm);
         }).addClass('btn-primary');
         
-        // Add View Rental Booking button if linked
         if (frm.doc.rental_booking) {
             frm.add_custom_button(__('View Rental Booking'), () => {
                 frappe.set_route('Form', 'Rental Booking', frm.doc.rental_booking);
@@ -99,7 +88,6 @@ function add_contract_buttons(frm) {
         }
     }
     
-    // Add Template Terms button if terms are empty (for both new and existing drafts)
     if (frm.doc.docstatus === 0 && (!frm.doc.legal_and_terms || frm.doc.legal_and_terms.trim() === '')) {
         frm.add_custom_button(__('Add Template Terms'), () => {
             add_template_terms(frm);
@@ -119,8 +107,7 @@ function populate_from_rental_booking(frm) {
         callback: function(r) {
             if (r.message) {
                 const booking = r.message;
-                
-                // Populate basic fields (no calculation, just copy totals)
+           
                 frm.set_value('customer', booking.customer);
                 frm.set_value('vehicle', booking.vehicle);
                 frm.set_value('rental_start_date', booking.rental_start || '');
@@ -129,12 +116,9 @@ function populate_from_rental_booking(frm) {
                 frm.set_value('rate_per_day', booking.rate_per_day || '');
                 frm.set_value('total_amount', booking.amount || ''); // Take final total from booking
                 
-                // Get customer details
                 if (booking.customer) {
                     get_customer_details(frm, booking.customer);
                 }
-                
-                // Get vehicle details
                 if (booking.vehicle) {
                     get_vehicle_details(frm, booking.vehicle);
                 }
@@ -209,7 +193,6 @@ function clear_rental_fields(frm) {
 }
 
 function update_status_display(frm) {
-    // Add visual indicators based on status
     if (frm.doc.contract_status === 'Active') {
         frm.dashboard.add_indicator(__('Active Contract'), 'green');
     } else if (frm.doc.contract_status === 'Completed') {
@@ -311,9 +294,8 @@ Company Representative: _________________ Date: ___________`;
     );
 }
 
-// Additional Services child table events - Just for display, no calculation needed
+
 frappe.ui.form.on('Additional Services', {
-    // Remove all calculation functions since we get totals from rental booking
     additional_services_remove(frm) {
         // Just refresh the table display
         frm.refresh_field('additional_services');
