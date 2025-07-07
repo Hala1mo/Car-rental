@@ -128,14 +128,6 @@ Automatic rental completion when:
 3. ✅ Invoice outstanding amount becomes zero
 4. 🔄 System automatically completes rental and frees vehicle
 
-## ⚡ Installation
-
-1. 📥 Clone the repository to Frappe bench apps folder
-2. 🔧 Install app: `bench --site [site-name] install-app car_rental`
-3. 📊 Setup master data (Vehicles, Customers)
-4. ⚙️ Configure Car Rental Settings
-5. 🛠️ Create required Items for invoicing
-
 ## 🔧 Configuration
 
 ### 📦 Required Items
