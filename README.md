@@ -15,20 +15,6 @@ This system manages the complete car rental business process with automated work
 - **💰 Financial Integration**: Invoice generation and payment tracking
 - **⚡ Status Automation**: Intelligent updates across all related documents
 
-## 🏗️ System Architecture
-
-### 🐍 Backend (Python/Frappe)
-- Document models with business logic
-- API endpoints for client integration
-- Automated workflow engines
-- Cross-document status synchronization
-
-### 🌐 Frontend (JavaScript/Frappe UI)
-- Dynamic forms with real-time validation
-- Smart navigation between documents
-- Auto-population and calculations
-- Context-aware user interface
-
 ## 📊 Essential DocTypes
 
 ### 1. 📝 Rental Booking
