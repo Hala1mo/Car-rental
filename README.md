@@ -138,6 +138,3 @@ Automatic rental completion when:
 - Default rental service item
 - Default additional service item
 
-## 👨‍💻 Author
-
-**Hala1mo** - Full Stack Developer specializing in Frappe Framework and enterprise business applications.
