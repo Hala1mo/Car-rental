@@ -31,10 +31,15 @@ class VehicleInspection(Document):
         rental_doc = frappe.get_doc('Rental Booking', self.rental_booking)
 
         if self.inspection_type == 'Pre-Inspection':
-            # Submit the rental booking if still draft
-            if rental_doc.docstatus == 0:
-                rental_doc.status = 'Confirmed'
+           
+            if not rental_doc.pre_inspection:  
                 rental_doc.pre_inspection = self.name
+                frappe.db.set_value('Rental Booking', self.rental_booking, 'pre_inspection', self.name)
+                frappe.db.commit()
+                
+            if rental_doc.docstatus == 0:
+                rental_doc.reload()
+                rental_doc.status = 'Confirmed'
                 rental_doc.flags.ignore_permissions = True
                 rental_doc.submit()
 
@@ -44,7 +49,12 @@ class VehicleInspection(Document):
             rental_doc.flags.ignore_permissions = True
             rental_doc.flags.ignore_validate_update_after_submit = True
             rental_doc.save()
-
+            rental_doc.reload()
+            if rental_doc.status == 'Out' and rental_doc.pre_inspection == self.name:
+                    frappe.msgprint(f"Rental booking {self.rental_booking} status updated to 'Out'", alert=True, indicator='green')
+            else:
+                    frappe.log_error(f"Status update verification failed for {self.rental_booking}")
+        
         elif self.inspection_type == 'Post-Inspection':
             rental_doc.reload()
             rental_doc.status = 'Returned'

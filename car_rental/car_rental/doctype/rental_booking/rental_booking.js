@@ -64,8 +64,6 @@ frappe.ui.form.on('Rental Booking', {
         });
     
         setup_date_restrictions(frm);
-        
-        // Only add action buttons if document is saved (not new/local)
         if (!frm.doc.__islocal && frm.doc.name) {
             add_action_buttons(frm);
         }
@@ -73,14 +71,12 @@ frappe.ui.form.on('Rental Booking', {
 
     after_save(frm) {
         console.log('Document saved, adding action buttons');
-        // Add buttons after save
         setTimeout(() => {
             add_action_buttons(frm);
         }, 500);
     },
 
     status(frm) {
-        // Only refresh buttons if document is saved
         if (!frm.doc.__islocal && frm.doc.name) {
             setTimeout(() => {
                 add_action_buttons(frm);
@@ -99,8 +95,6 @@ frappe.ui.form.on('Rental Booking', {
             message: __('Rental booking submitted successfully'),
             indicator: 'green'
         });
-        
-        // Refresh buttons after submit
         setTimeout(() => {
             add_action_buttons(frm);
         }, 1000);
@@ -146,8 +140,6 @@ frappe.ui.form.on('Rental Booking', {
 
 function create_rental_contract(frm) {
     console.log('Creating rental contract for booking:', frm.doc.name);
-    
-    // Validate required data
     if (!frm.doc.customer) {
         frappe.msgprint({
             title: __('Missing Information'),
@@ -175,7 +167,6 @@ function create_rental_contract(frm) {
         return;
     }
     
-    // Call the contract creation method
     frappe.call({
         method: 'car_rental.car_rental.doctype.rental_contract.rental_contract.create_contract_from_booking',
         args: {
@@ -183,10 +174,8 @@ function create_rental_contract(frm) {
         },
         callback: function(response) {
             if (response.message && response.message.status === 'success') {
-                // Navigate to the newly created contract
                 frappe.set_route('Form', 'Rental Contract', response.message.contract_name);
-                
-                // Show success message
+            
                 frappe.show_alert({
                     message: response.message.message,
                     indicator: 'green'
@@ -197,7 +186,6 @@ function create_rental_contract(frm) {
                 }, 1000);
                 
             } else if (response.message && response.message.status === 'exists') {
-                // Contract already exists, offer to view it
                 frappe.confirm(
                     __('Contract already exists. Do you want to view it?'),
                     () => {
@@ -227,8 +215,7 @@ function create_rental_contract(frm) {
 
 function create_sales_invoice(frm) {
     console.log('Creating sales invoice for rental booking:', frm.doc.name);
-    
-    // Validate required data
+
     if (!frm.doc.customer) {
         frappe.msgprint({
             title: __('Missing Information'),
@@ -255,16 +242,16 @@ function create_sales_invoice(frm) {
         },
         callback: function(response) {
             if (response.message && response.message.status === 'success') {
-                // Navigate to the newly created invoice
+            
                 frappe.set_route('Form', 'Sales Invoice', response.message.invoice_name);
                 
-                // Show success message
+        
                 frappe.show_alert({
                     message: response.message.message,
                     indicator: 'green'
                 });
                 
-                // Refresh the current form to update references
+    
                 setTimeout(() => {
                     frm.reload_doc();
                 }, 1000);
@@ -288,114 +275,6 @@ function create_sales_invoice(frm) {
 }
 
 
-// function add_action_buttons(frm) {
-//     // Debug logging
-//     console.log('=== ADD ACTION BUTTONS DEBUG ===');
-//     console.log('Document Name:', frm.doc.name);
-//     console.log('Is Local (new doc):', frm.doc.__islocal);
-//     console.log('Status:', frm.doc.status);
-//     console.log('DocStatus:', frm.doc.docstatus);
-//     console.log('Pre-Inspection:', frm.doc.pre_inspection);
-//     console.log('Post-Inspection:', frm.doc.post_inspection);
-//     console.log('Contract:', frm.doc.rental_contract);
-//     console.log('================================');
-    
-//     if (!frm.doc.name || frm.doc.__islocal) {
-//         console.log('❌ Document not saved yet, skipping buttons');
-//         return;
-//     }
-    
-//     // Clear existing custom buttons first
-//     frm.clear_custom_buttons();
-    
-//     // Create Contract button for submitted documents without contract
-//     if (frm.doc.docstatus === 1 && !frm.doc.rental_contract) {
-//         console.log('✅ Adding Create Contract button');
-//         frm.add_custom_button(__('Create Contract'), () => {
-//             create_rental_contract(frm);
-//         }).addClass("btn-success");
-//     }
-    
-//     // // View Contract button if contract exists
-//     if (frm.doc.rental_contract) {
-//         console.log('✅ Adding View Contract button');
-//         frm.add_custom_button(__('View Contract'), () => {
-//             frappe.set_route('Form', 'Rental Contract', frm.doc.rental_contract);
-//         });
-//     }
-
- 
-//    if (!frm.doc.pre_inspection && 
-//     (((frm.doc.status === 'Draft' || frm.doc.status === 'Confirmed') && frm.doc.docstatus === 0) || 
-//      (frm.doc.docstatus === 1))) {
-    
-//     console.log('✅ Adding Create Vehicle Inspection button');
-//     frm.add_custom_button(__('Create Vehicle Inspection'), () => {
-//         create_inspection_with_type(frm, 'Pre-Inspection');
-//     }).addClass("btn-primary");
-//     }
-
-
-// if (frm.doc.pre_inspection) {
-//     console.log('✅ Adding View Pre-Inspection button');
-//     frm.add_custom_button(__('View Pre-Inspection'), () => {
-//         frappe.set_route('Form', 'Vehicle Inspection', frm.doc.pre_inspection);
-//     });
-// }
-//     // Create Post-Inspection button
-//     if (frm.doc.status === 'Out' && !frm.doc.post_inspection) {
-//         console.log('✅ Adding Create Post-Inspection button');
-//         frm.add_custom_button(__('Create Post-Inspection'), () => {
-//             create_inspection_with_type(frm, 'Post-Inspection');
-//         }).addClass("btn-primary");
-//     }
-    
-//     // View Post-Inspection button
-//     if (frm.doc.post_inspection) {
-//         console.log('✅ Adding View Post-Inspection button');
-//         frm.add_custom_button(__('View Post-Inspection'), () => {
-//             frappe.set_route('Form', 'Vehicle Inspection', frm.doc.post_inspection);
-//         });
-//     }
-    
-//     // Create Sales Invoice button
-//     if (frm.doc.status === 'Returned' && frm.doc.post_inspection && !frm.doc.sales_invoice) {
-//         console.log('✅ Adding Create Sales Invoice button');
-        
-//         // Check if post-inspection is submitted
-//         frappe.db.get_value('Vehicle Inspection', frm.doc.post_inspection, 'docstatus')
-//         .then(r => {
-//             if (r.message.docstatus === 1) { // 1 = Submitted
-//                 frm.add_custom_button(__('Create Sales Invoice'), () => {
-//                     create_sales_invoice(frm);
-//                 }).addClass("btn-success");
-//                 console.log('✅ Create Sales Invoice button added');
-//             }
-//         });
-//     }
-    
-//     // View Sales Invoice button
-//     if (frm.doc.sales_invoice) {
-//         console.log('✅ Adding View Sales Invoice button');
-//         frm.add_custom_button(__('View Sales Invoice'), () => {
-//             frappe.set_route('Form', 'Sales Invoice', frm.doc.sales_invoice);
-//         });
-//     }
-
-//     // Auto-complete check for paid invoices
-//     if (frm.doc.status === 'Returned' && frm.doc.sales_invoice) {
-//         // Check if sales invoice is submitted AND paid
-//         frappe.db.get_value('Sales Invoice', frm.doc.sales_invoice, ['docstatus', 'outstanding_amount'])
-//         .then(r => {
-//             if (r.message.docstatus === 1 && r.message.outstanding_amount === 0) {
-//                 // Invoice is submitted and fully paid
-//                 frm.set_value('status', 'Completed');
-//                 frm.save();
-//             }
-//         });
-//     }
-// }
-
 
 function add_action_buttons(frm) {
     console.log('=== ADD ACTION BUTTONS DEBUG ===');
@@ -411,7 +290,7 @@ function add_action_buttons(frm) {
         return;
     }
     
-    // Clear existing custom buttons first
+ 
     frm.clear_custom_buttons();
     
     // Create Contract button for submitted documents without contract
@@ -430,9 +309,8 @@ function add_action_buttons(frm) {
         });
     }
 
-    // ✅ FIXED PRE-INSPECTION LOGIC
+    
     if (frm.doc.pre_inspection) {
-        // Always show View Pre-Inspection button if pre-inspection exists
         console.log('✅ Adding View Pre-Inspection button');
         frm.add_custom_button(__('View Pre-Inspection'), () => {
             frappe.set_route('Form', 'Vehicle Inspection', frm.doc.pre_inspection);
@@ -443,10 +321,6 @@ function add_action_buttons(frm) {
         .then(r => {
             console.log('Pre-inspection docstatus:', r.message.docstatus);
             
-            // Show Create Post-Inspection button if:
-            // 1. Status is 'Out' 
-            // 2. No post-inspection exists
-            // 3. Pre-inspection is submitted (docstatus = 1)
             if (frm.doc.status === 'Out' && 
                 !frm.doc.post_inspection && 
                 r.message.docstatus === 1) {
@@ -458,8 +332,7 @@ function add_action_buttons(frm) {
             }
         });
     } else {
-        // Show Create Pre-Inspection button if no pre-inspection exists
-        if (frm.doc.status === 'Draft' || frm.doc.status === 'Confirmed' || frm.doc.status === 'Out') {
+        if (frm.doc.status === 'Draft' || frm.doc.status === 'Confirmed') {
             console.log('✅ Adding Create Vehicle Inspection (Pre-Inspection) button');
             frm.add_custom_button(__('Create Vehicle Inspection'), () => {
                 create_inspection_with_type(frm, 'Pre-Inspection');
@@ -467,14 +340,12 @@ function add_action_buttons(frm) {
         }
     }
     
-    // View Post-Inspection button
     if (frm.doc.post_inspection) {
         console.log('✅ Adding View Post-Inspection button');
         frm.add_custom_button(__('View Post-Inspection'), () => {
             frappe.set_route('Form', 'Vehicle Inspection', frm.doc.post_inspection);
         });
         
-        // Create Sales Invoice button (async check)
         if (frm.doc.status === 'Returned' && !frm.doc.sales_invoice) {
             console.log('✅ Checking if we can add Create Sales Invoice button');
             
@@ -490,7 +361,6 @@ function add_action_buttons(frm) {
         }
     }
     
-    // View Sales Invoice button
     if (frm.doc.sales_invoice) {
         console.log('✅ Adding View Sales Invoice button');
         frm.add_custom_button(__('View Sales Invoice'), () => {

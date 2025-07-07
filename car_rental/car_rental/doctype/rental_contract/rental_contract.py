@@ -140,17 +140,14 @@ class RentalContract(Document):
 def create_contract_from_booking(rental_booking_name):
     """Create rental contract from rental booking"""
     try:
-        # Validate rental booking
         rental_doc = frappe.get_doc('Rental Booking', rental_booking_name)
-        
-        # Check if rental booking is submitted
+    
         if rental_doc.docstatus != 1:
             return {
                 'status': 'error',
                 'message': 'Rental booking must be submitted before creating contract'
             }
         
-        # Check if contract already exists
         existing_contract = frappe.get_value('Rental Contract', 
                                            {'rental_booking': rental_booking_name, 'docstatus': ['!=', 2]}, 
                                            'name')
@@ -161,11 +158,11 @@ def create_contract_from_booking(rental_booking_name):
                 'message': f'Contract {existing_contract} already exists for this rental booking'
             }
         
-        # Create new contract
+    
         contract = frappe.new_doc('Rental Contract')
         contract.rental_booking = rental_booking_name
         contract.contract_status = 'Draft'
-        contract.flags._skip_auto_populate = False  # Allow auto-population
+        contract.flags._skip_auto_populate = False  
         contract.insert()
         
         return {

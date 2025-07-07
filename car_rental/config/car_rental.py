@@ -39,9 +39,9 @@ def get_data():
                 },
                 {
                     "type": "doctype",
-                    "name": "Customer",
-                    "doctype": "Customer",
-                    "description": _("Customer database")
+                    "name": "Vehicle Inspection",
+                    "doctype": "Vehicle Inspection",
+                    "description": _("Vehicle Inspection")
                 }
             ]
         },

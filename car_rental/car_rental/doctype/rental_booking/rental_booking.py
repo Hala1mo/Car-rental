@@ -327,7 +327,6 @@ def create_sales_invoice_from_booking(rental_booking_name):
         rental_doc = frappe.get_doc('Rental Booking', rental_booking_name)
         frappe.log_error(f"✅ Rental doc loaded: {rental_doc.name}", "Sales Invoice Debug")
         
-        # Get settings safely
         try:
             settings = frappe.get_single('Car Rental Settings')
         except:
@@ -350,7 +349,7 @@ def create_sales_invoice_from_booking(rental_booking_name):
         
         frappe.log_error("✅ All validations passed, creating invoice", "Sales Invoice Debug")
         
-        # Create invoice
+        
         invoice = frappe.new_doc('Sales Invoice')
         invoice.customer = rental_doc.customer
         invoice.posting_date = frappe.utils.today()
@@ -360,10 +359,10 @@ def create_sales_invoice_from_booking(rental_booking_name):
         
         frappe.log_error("✅ Invoice header created", "Sales Invoice Debug")
         
-        # Add rental service item
+      
         rental_item = invoice.append('items', {})
         
-        # Use a safe item code
+       
         if settings and hasattr(settings, 'rental_service') and settings.rental_service:
             rental_item.item_code = settings.rental_service
         else:
@@ -377,20 +376,16 @@ def create_sales_invoice_from_booking(rental_booking_name):
         
         frappe.log_error(f"✅ Main rental item added: {rental_item.item_code}", "Sales Invoice Debug")
         
-        # Add additional services if any
         if hasattr(rental_doc, 'additional_services') and rental_doc.additional_services:
             frappe.log_error(f"📋 Processing {len(rental_doc.additional_services)} additional services", "Sales Invoice Debug")
             
             for idx, service in enumerate(rental_doc.additional_services):
                 try:
-                    # Skip if service doesn't have required fields
                     if not hasattr(service, 'service_name') or not service.service_name:
                         frappe.log_error(f"⚠️ Service {idx+1} missing service_name, skipping", "Sales Invoice Debug")
                         continue
                     
                     service_item = invoice.append('items', {})
-                    
-                    # Use the "General Services" item code for all additional services
                     service_item.item_code = 'SERVICE-GENERAL'
                     service_item.item_name = service.service_name
                     service_item.description = f"{service.service_name} - {getattr(service, 'description', '')}"
@@ -403,12 +398,10 @@ def create_sales_invoice_from_booking(rental_booking_name):
                 except Exception as service_error:
                     frappe.log_error(f"⚠️ Error adding service {idx+1}: {str(service_error)}", "Sales Invoice Debug")
                     frappe.log_error(f"⚠️ Service data: {service}", "Sales Invoice Debug")
-                    # Continue with other services
                     continue
         else:
             frappe.log_error("ℹ️ No additional services found", "Sales Invoice Debug")
         
-        # Set rental booking reference if field exists
         try:
             if hasattr(invoice, 'rental_booking_reference'):
                 invoice.rental_booking_reference = rental_doc.name
@@ -416,13 +409,12 @@ def create_sales_invoice_from_booking(rental_booking_name):
             pass
         
         frappe.log_error("🚀 Attempting to insert invoice", "Sales Invoice Debug")
-        
-        # Insert invoice
+  
         invoice.insert()
         
         frappe.log_error(f"✅ Invoice created: {invoice.name}", "Sales Invoice Debug")
         
-        # Update rental booking with invoice reference
+
         rental_doc.sales_invoice = invoice.name
         rental_doc.flags.ignore_permissions = True
         rental_doc.flags.ignore_validate_update_after_submit = True

@@ -151,11 +151,6 @@ function populate_from_rental_booking(frm) {
                     });
                     frm.refresh_field('additional_services');
                 }
-                
-                frappe.show_alert({
-                    message: __('Contract populated from rental booking'),
-                    indicator: 'green'
-                });
             }
         }
     });
